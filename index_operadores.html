@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Operadores - Wash Motion</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --azul: #0057FF;
+    --azul-dark: #0040CC;
+    --negro: #0A0A0A;
+    --blanco: #FFFFFF;
+    --acento: #00E5FF;
+    --bg-card: rgba(255,255,255,0.035);
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--negro);
+    color: var(--blanco);
+    overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ── FONDO DINÁMICO (Estilo Wash Motion) ── */
+  .bg-grid { position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: -1; }
+  .bg-glow { position: fixed; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,87,255,0.15) 0%, transparent 70%); pointer-events: none; z-index: -2; }
+
+  /* ── CONTENEDOR LOGIN ── */
+  .login-container {
+    text-align: center;
+    padding: 24px;
+    animation: fadeDown 0.6s ease both;
+    width: 100%;
+    max-width: 400px;
+  }
+
+  h1.brand-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 80px;
+    line-height: 0.88;
+    margin-bottom: 8px;
+  }
+
+  h1.brand-title span { color: var(--azul); }
+
+  .login-box {
+    background: var(--bg-card);
+    border: 1px solid rgba(255,255,255,0.07);
+    padding: 32px;
+    border-radius: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+  }
+
+  input {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--blanco);
+    padding: 16px;
+    border-radius: 12px;
+    font-size: 16px;
+    outline: none;
+    transition: all 0.2s;
+    text-align: center;
+  }
+
+  input:focus { 
+    border-color: var(--azul); 
+    box-shadow: 0 0 15px rgba(0,87,255,0.2); 
+    background: rgba(0,0,0,0.7);
+  }
+
+  .btn-primary {
+    background: var(--azul);
+    color: var(--blanco);
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 700;
+    padding: 16px;
+    border-radius: 100px;
+    transition: all 0.25s ease;
+    margin-top: 8px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-primary:hover {
+    background: var(--azul-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(0,87,255,0.4);
+  }
+
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  #error-msg { color: #ff4444; font-size: 14px; min-height: 20px; margin-top: 5px; font-weight: 500; }
+
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</head>
+<body>
+
+<div class="bg-glow"></div>
+<div class="bg-grid"></div>
+
+<div class="login-container">
+  <h1 class="brand-title">OP<span>WASH</span></h1>
+  <p style="color: rgba(255,255,255,0.45); margin-bottom: 24px; font-weight: 300;">Portal de Operadores Logísticos</p>
+  
+  <div class="login-box">
+    <input type="email" id="email" placeholder="Usuario (Email)" onkeypress="handleEnter(event)">
+    <input type="password" id="pass" placeholder="Contraseña" onkeypress="handleEnter(event)">
+    <p id="error-msg"></p>
+    <button class="btn-primary" id="btn-login" onclick="login()">Ingresar al Sistema</button>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+
+<script>
+  // ── CONFIGURACIÓN DE FIREBASE ──
+  const firebaseConfig = {
+    apiKey: "AIzaSyAtCp9BVAxV-UOBUvadw2HJFT4xRK92rAI",
+    authDomain: "wash-motion.firebaseapp.com",
+    projectId: "wash-motion",
+    storageBucket: "wash-motion.firebasestorage.app",
+    messagingSenderId: "G-6JDGHTPXQ1",
+    appId: "1:556874047360:web:f027551e6510915f3dab65"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  // ── URL DEL PUENTE (Google Apps Script) ──
+  const BRIDGE_URL = 'https://script.google.com/macros/s/AKfycby9-AVYnQPt7olxJ2m4OG2-ogaWflx97QiO8CEaXE9XnptNmFtBYfatkOTJHzDoIf0SuQ/exec';
+
+  async function login() {
+    const emailInput = document.getElementById('email').value.toLowerCase().trim();
+    const passInput = document.getElementById('pass').value;
+    const errorMsg = document.getElementById('error-msg');
+    const btn = document.getElementById('btn-login');
+
+    if (!emailInput || !passInput) {
+      errorMsg.innerText = "Completa todos los campos";
+      return;
+    }
+
+    errorMsg.innerText = "";
+    btn.innerText = "Verificando...";
+    btn.disabled = true;
+
+    try {
+      // 1. Validar identidad con Firebase
+      const userCredential = await auth.signInWithEmailAndPassword(emailInput, passInput);
+      const userEmail = userCredential.user.email;
+
+      // 2. Pedir link privado al Puente de Google
+      const response = await fetch(`${BRIDGE_URL}?email=${userEmail}`);
+      const data = await response.json();
+
+      if (data.url && data.url !== "error") {
+        // 3. Redirección automática a la App del operador
+        window.location.href = data.url;
+      } else {
+        errorMsg.innerText = "No tienes una App asignada.";
+        auth.signOut();
+      }
+
+    } catch (error) {
+      console.error("Error de Login:", error.code);
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+        errorMsg.innerText = "Usuario o contraseña incorrectos.";
+      } else {
+        errorMsg.innerText = "Error de acceso. Reintenta.";
+      }
+    } finally {
+      btn.innerText = "Ingresar al Sistema";
+      btn.disabled = false;
+    }
+  }
+
+  function handleEnter(e) {
+    if (e.key === 'Enter') login();
+  }
+</script>
+
+</body>
+</html>
