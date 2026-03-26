@@ -3,17 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Operadores - Wash Motion</title>
+<title>OpWash — Wash Motion</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
   :root {
-    --azul: #0057FF;
-    --azul-dark: #0040CC;
-    --negro: #0A0A0A;
-    --blanco: #FFFFFF;
-    --acento: #00E5FF;
+    --azul: #0057FF; --azul-dark: #0040CC;
+    --negro: #0A0A0A; --blanco: #FFFFFF; --acento: #00E5FF;
     --bg-card: rgba(255,255,255,0.035);
   }
 
@@ -23,32 +20,31 @@
     color: var(--blanco);
     overflow-x: hidden;
     min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
-  /* ── FONDO DINÁMICO (Estilo Wash Motion) ── */
-  .bg-grid { position: fixed; inset: 0; background-image: linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: -1; }
-  .bg-glow { position: fixed; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,87,255,0.15) 0%, transparent 70%); pointer-events: none; z-index: -2; }
+  .bg-grid { position:fixed; inset:0; background-image:linear-gradient(rgba(255,255,255,0.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.025) 1px,transparent 1px); background-size:40px 40px; pointer-events:none; z-index:-1; }
+  .bg-glow { position:fixed; inset:0; background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(0,87,255,0.15) 0%,transparent 70%); pointer-events:none; z-index:-2; }
 
-  /* ── CONTENEDOR LOGIN ── */
-  .login-container {
+  /* ── LOGIN ── */
+  #login-screen {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     text-align: center;
     padding: 24px;
     animation: fadeDown 0.6s ease both;
-    width: 100%;
-    max-width: 400px;
   }
 
-  h1.brand-title {
+  .brand-title {
     font-family: 'Bebas Neue', sans-serif;
     font-size: 80px;
     line-height: 0.88;
     margin-bottom: 8px;
   }
 
-  h1.brand-title span { color: var(--azul); }
+  .brand-title span { color: var(--azul); }
 
   .login-box {
     background: var(--bg-card);
@@ -58,6 +54,8 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    width: 100%;
+    max-width: 340px;
     backdrop-filter: blur(10px);
     box-shadow: 0 20px 40px rgba(0,0,0,0.4);
   }
@@ -68,46 +66,119 @@
     color: var(--blanco);
     padding: 16px;
     border-radius: 12px;
+    font-family: inherit;
     font-size: 16px;
     outline: none;
-    transition: all 0.2s;
     text-align: center;
+    transition: all 0.2s;
   }
 
-  input:focus { 
-    border-color: var(--azul); 
-    box-shadow: 0 0 15px rgba(0,87,255,0.2); 
+  input:focus {
+    border-color: var(--azul);
+    box-shadow: 0 0 15px rgba(0,87,255,0.2);
     background: rgba(0,0,0,0.7);
   }
 
   .btn-primary {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
     background: var(--azul);
     color: var(--blanco);
     border: none;
     cursor: pointer;
+    font-family: inherit;
     font-size: 16px;
     font-weight: 700;
-    padding: 16px;
+    padding: 16px 32px;
     border-radius: 100px;
     transition: all 0.25s ease;
-    margin-top: 8px;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 0 20px rgba(0,87,255,0.2);
   }
 
-  .btn-primary:hover {
-    background: var(--azul-dark);
-    transform: translateY(-2px);
-    box-shadow: 0 0 30px rgba(0,87,255,0.4);
+  .btn-primary::after { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,255,255,0.12),transparent); border-radius:inherit; }
+
+  .btn-primary:hover { background:var(--azul-dark); transform:translateY(-2px); box-shadow:0 0 30px rgba(0,87,255,0.4); }
+  .btn-primary:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+
+  #error-msg { color:#ff4444; font-size:14px; min-height:18px; font-weight:500; }
+
+  /* ── DASHBOARD ── */
+  #dashboard {
+    display: none;
+    flex-direction: column;
+    padding: 24px;
+    height: 100vh;
+    max-width: 1400px;
+    margin: 0 auto;
+    animation: fadeDown 0.6s ease both;
   }
 
-  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+  #dashboard.visible { display: flex; }
 
-  #error-msg { color: #ff4444; font-size: 14px; min-height: 20px; margin-top: 5px; font-weight: 500; }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+    flex-shrink: 0;
+  }
 
-  @keyframes fadeDown {
-    from { opacity: 0; transform: translateY(-12px); }
-    to   { opacity: 1; transform: translateY(0); }
+  .header-brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 0.02em;
+  }
+
+  .header-brand span { color: var(--azul); }
+
+  .header-user {
+    font-size: 12px;
+    color: rgba(255,255,255,0.35);
+    margin-top: 2px;
+  }
+
+  .btn-logout {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.35);
+    font-family: inherit;
+    font-size: 13px;
+    padding: 10px 16px;
+    border-radius: 100px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-logout:hover { border-color:rgba(255,100,100,0.5); color:#ff6666; }
+
+  .iframe-wrap {
+    flex: 1;
+    background: var(--bg-card);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .iframe-wrap iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  @keyframes fadeDown { from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:translateY(0)} }
+
+  @media (max-width:768px) {
+    header { flex-direction:column; align-items:flex-start; }
+    #dashboard { padding:16px; }
   }
 </style>
 </head>
@@ -116,86 +187,128 @@
 <div class="bg-glow"></div>
 <div class="bg-grid"></div>
 
-<div class="login-container">
+<!-- LOGIN -->
+<div id="login-screen">
   <h1 class="brand-title">OP<span>WASH</span></h1>
-  <p style="color: rgba(255,255,255,0.45); margin-bottom: 24px; font-weight: 300;">Portal de Operadores Logísticos</p>
-  
+  <p style="color:rgba(255,255,255,0.4);margin-bottom:28px;font-weight:300;font-size:15px;">
+    Portal de Operadores Logísticos
+  </p>
   <div class="login-box">
     <input type="email" id="email" placeholder="Usuario (Email)" onkeypress="handleEnter(event)">
     <input type="password" id="pass" placeholder="Contraseña" onkeypress="handleEnter(event)">
     <p id="error-msg"></p>
-    <button class="btn-primary" id="btn-login" onclick="login()">Ingresar al Sistema</button>
+    <button class="btn-primary" id="btn-login" onclick="login()">
+      Ingresar al Sistema
+    </button>
   </div>
 </div>
 
+<!-- DASHBOARD -->
+<div id="dashboard">
+  <header>
+    <div>
+      <div class="header-brand">OP<span>WASH</span></div>
+      <div class="header-user" id="header-user">—</div>
+    </div>
+    <button class="btn-logout" onclick="logout()">Salir</button>
+  </header>
+
+  <div class="iframe-wrap">
+    <iframe id="iframe-app" src="about:blank"></iframe>
+  </div>
+</div>
+
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
 
 <script>
-  // ── CONFIGURACIÓN DE FIREBASE ──
   const firebaseConfig = {
-    apiKey: "AIzaSyAtCp9BVAxV-UOBUvadw2HJFT4xRK92rAI",
-    authDomain: "wash-motion.firebaseapp.com",
-    projectId: "wash-motion",
-    storageBucket: "wash-motion.firebasestorage.app",
-    messagingSenderId: "G-6JDGHTPXQ1",
-    appId: "1:556874047360:web:f027551e6510915f3dab65"
+    apiKey            : "AIzaSyAtCp9BVAxV-UOBUvadw2HJFT4xRK92rAI",
+    authDomain        : "wash-motion.firebaseapp.com",
+    projectId         : "wash-motion",
+    storageBucket     : "wash-motion.firebasestorage.app",
+    messagingSenderId : "G-6JDGHTPXQ1",
+    appId             : "1:556874047360:web:f027551e6510915f3dab65"
   };
 
   firebase.initializeApp(firebaseConfig);
   const auth = firebase.auth();
 
-  // ── URL DEL PUENTE (Google Apps Script) ──
+  // ── BRIDGE URL (Apps Script — la URL del operador nunca viaja en este HTML) ──
   const BRIDGE_URL = 'https://script.google.com/macros/s/AKfycbyd0M5Y9Ao8A2AXPwobF4HS2xudzdFgZfkMFDCvYcEOj8iHxQhYTgSoZYo17iMzWNPb8g/exec';
 
+  // URL en memoria — solo se llena después de autenticación exitosa
+  let appURL = '';
+
+  // ── LOGIN ──
   async function login() {
-    const emailInput = document.getElementById('email').value.toLowerCase().trim();
-    const passInput = document.getElementById('pass').value;
+    const emailVal = document.getElementById('email').value.toLowerCase().trim();
+    const passVal  = document.getElementById('pass').value;
     const errorMsg = document.getElementById('error-msg');
-    const btn = document.getElementById('btn-login');
+    const btn      = document.getElementById('btn-login');
 
-    if (!emailInput || !passInput) {
-      errorMsg.innerText = "Completa todos los campos";
-      return;
-    }
+    if (!emailVal || !passVal) { errorMsg.innerText = 'Completá todos los campos'; return; }
 
-    errorMsg.innerText = "";
-    btn.innerText = "Verificando...";
-    btn.disabled = true;
+    errorMsg.innerText = '';
+    btn.innerText      = 'Verificando...';
+    btn.disabled       = true;
 
     try {
-      // 1. Validar identidad con Firebase
-      const userCredential = await auth.signInWithEmailAndPassword(emailInput, passInput);
-      const userEmail = userCredential.user.email;
+      // 1. Autenticar con Firebase
+      const cred  = await auth.signInWithEmailAndPassword(emailVal, passVal);
+      const email = cred.user.email;
 
-      // 2. Pedir link privado al Puente de Google
-      const response = await fetch(`${BRIDGE_URL}?email=${userEmail}`);
-      const data = await response.json();
+      // 2. Pedir URL al puente (nunca está en el HTML)
+      const res  = await fetch(`${BRIDGE_URL}?email=${encodeURIComponent(email)}`);
+      const data = await res.json();
 
-      if (data.url && data.url !== "error") {
-        // 3. Redirección automática a la App del operador
-        window.location.href = data.url;
-      } else {
-        errorMsg.innerText = "No tienes una App asignada.";
-        auth.signOut();
+      if (!data.url || data.url === 'error') {
+        await auth.signOut();
+        errorMsg.innerText = 'No tenés una App asignada.';
+        return;
       }
 
-    } catch (error) {
-      console.error("Error de Login:", error.code);
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-        errorMsg.innerText = "Usuario o contraseña incorrectos.";
-      } else {
-        errorMsg.innerText = "Error de acceso. Reintenta.";
-      }
+      // 3. Guardar URL solo en memoria y mostrar dashboard
+      appURL = data.url;
+      mostrarDashboard(email);
+
+    } catch (err) {
+      console.error(err.code);
+      errorMsg.innerText =
+        err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password'
+          ? 'Usuario o contraseña incorrectos.'
+          : 'Error de acceso. Reintentá.';
     } finally {
-      btn.innerText = "Ingresar al Sistema";
-      btn.disabled = false;
+      btn.innerText = 'Ingresar al Sistema';
+      btn.disabled  = false;
     }
   }
 
-  function handleEnter(e) {
-    if (e.key === 'Enter') login();
+  // ── MOSTRAR DASHBOARD ──
+  function mostrarDashboard(email) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('dashboard').classList.add('visible');
+    document.getElementById('header-user').textContent = email;
+
+    // Cargar iframe recién aquí — URL viene del puente, no del HTML
+    document.getElementById('iframe-app').src = appURL;
   }
+
+  // ── LOGOUT ──
+  function logout() {
+    auth.signOut().then(() => {
+      appURL = '';
+      document.getElementById('iframe-app').src = 'about:blank';
+      document.getElementById('dashboard').classList.remove('visible');
+      document.getElementById('login-screen').style.display = 'flex';
+      document.getElementById('email').value = '';
+      document.getElementById('pass').value  = '';
+      document.getElementById('error-msg').innerText = '';
+    });
+  }
+
+  function handleEnter(e) { if (e.key === 'Enter') login(); }
 </script>
 
 </body>
