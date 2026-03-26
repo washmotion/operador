@@ -263,7 +263,13 @@
       const res  = await fetch(`${BRIDGE_URL}?email=${encodeURIComponent(email)}`);
       const data = await res.json();
 
-      if (!data.url || data.url === 'error') {
+      if (data.role === 'admin') {
+        await auth.signOut();
+        errorMsg.innerText = 'Usá el portal de administradores.';
+        return;
+      }
+
+      if (data.role !== 'operator' || !data.url) {
         await auth.signOut();
         errorMsg.innerText = 'No tenés una App asignada.';
         return;
